@@ -29,7 +29,7 @@ setInterval(() => {
   let utcDate = new Date();
   let h = utcDate.getUTCHours();
   if (h >= 12 || h == 0) {
-    ping(pingUrl);
+    ping(pingUrls);
   }
 }, pingGapTime);
 
