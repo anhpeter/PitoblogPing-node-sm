@@ -12,7 +12,7 @@ app.use(morgan("combined"));
 //
 
 app.get("/", (req, res) => {
-  res.send("Pito Blog Ping! ping 1");
+  res.send("Pito Blog Ping 1! v1");
 });
 
 app.listen(port, () => {
@@ -21,7 +21,7 @@ app.listen(port, () => {
 
 // PING
 let appDomain = "https://pitoblog-ping1.herokuapp.com/";
-let pingUrls = ["https://pitoblog-ping.glitch.me/", appDomain];
+let pingUrls = ["https://pitoghichep.com/ping", appDomain];
 let pingGapTime = 5 * 60 * 1000;
 
 ping(pingUrls);
@@ -38,6 +38,7 @@ function ping(urls) {
     axios
       .get(url)
       .then((_) => {
+        console.log(_.data);
         console.log(`Make ${url} alive! - from ${appDomain}`);
       })
       .catch((e) => {
