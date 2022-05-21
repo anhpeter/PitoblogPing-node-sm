@@ -21,7 +21,7 @@ app.listen(port, () => {
 
 // PING
 let appDomain = "https://pitoblog-ping2.herokuapp.com/";
-let pingUrls = ["https://pitoblog-ping.glitch.me/", appDomain];
+let pingUrls = ["https://pitoghichep.com/ping", appDomain];
 let pingGapTime = 5 * 60 * 1000;
 
 ping(pingUrls);
