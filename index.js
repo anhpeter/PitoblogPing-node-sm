@@ -12,7 +12,7 @@ app.use(morgan("combined"));
 //
 
 app.get("/", (req, res) => {
-  res.send("Pito Blog Ping! v1");
+  res.send("Pito Blog Ping 2! v1");
 });
 
 app.listen(port, () => {
