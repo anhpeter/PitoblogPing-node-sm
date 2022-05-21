@@ -38,6 +38,7 @@ function ping(urls) {
     axios
       .get(url)
       .then((_) => {
+        console.log(_.data);
         console.log(`Make ${url} alive! - from ${appDomain}`);
       })
       .catch((e) => {
