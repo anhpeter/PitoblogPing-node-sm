@@ -12,7 +12,7 @@ app.use(morgan("combined"));
 //
 
 app.get("/", (req, res) => {
-  res.send("Pito Blog Ping! v1");
+  res.send("Pito Blog Ping! ping 1");
 });
 
 app.listen(port, () => {
@@ -20,7 +20,7 @@ app.listen(port, () => {
 });
 
 // PING
-let appDomain = "https://pitoblog-ping2.herokuapp.com/";
+let appDomain = "https://pitoblog-ping1.herokuapp.com/";
 let pingUrls = ["https://pitoblog-ping.glitch.me/", appDomain];
 let pingGapTime = 5 * 60 * 1000;
 
@@ -28,7 +28,7 @@ ping(pingUrls);
 setInterval(() => {
   let utcDate = new Date();
   let h = utcDate.getUTCHours();
-  if (h >= 12 || h == 0) {
+  if (h >= 0 && h <= 12) {
     ping(pingUrls);
   }
 }, pingGapTime);
