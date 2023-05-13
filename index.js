@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
 
+const startDate = new Date();
 const app = express();
 app.use(express.json({ extended: false }));
 
@@ -50,9 +51,11 @@ const Helper = {
 const PORT = process.env.PORT || 3000;
 const pingUrlIn = 5 * 60 * 1000;
 const pingMeIn = 30 * 1000;
-const pitoBlogUrls = [
+const PING_URLS = [
+  "https://peter-kaffeine2.glitch.me",
   "https://pitoghichep.com",
   "https://pitoblogapi.as.r.appspot.com",
+  "https://onlinecourseserver.onrender.com",
 ];
 
 const pingUrls = (urls) => {
@@ -63,7 +66,7 @@ const pingUrls = (urls) => {
 
 // PING URLS INTERVAL
 setInterval(async () => {
-  pingUrls(pitoBlogUrls);
+  pingUrls(PING_URLS);
   //
   LogModel.savePingLog();
 }, [pingUrlIn]);
@@ -87,7 +90,7 @@ app.get("/ping", (req, res) => {
 
 // SHOW PING INFORMATION
 app.get("/", async (req, res) => {
-  const pingUrls = pitoBlogUrls;
+  const pingUrls = PING_URLS;
   const pings = await Log.find({ type: "ping" })
     .sort({ timestamp: -1 })
     .limit(10)
@@ -113,6 +116,9 @@ app.get("/", async (req, res) => {
     JSON.stringify(
       {
         message: "kaffeine works",
+        severStartAt:
+          moment(startDate).utcOffset(7).format("YYYY/MM/DD HH:mm:ss") +
+          " GMT+7",
         pingUrls,
         pingUrlTimestamps: pings.map((item) =>
           Helper.toReadableTime(item.timestamp)
