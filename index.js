@@ -71,12 +71,14 @@ const PING_URLS = [
   "https://peter-kaffeine2.glitch.me",
   "https://pitoghichep.com",
   "https://pitoblogapi.as.r.appspot.com",
-  "https://onlinecourseserver.onrender.com",
+  "https://onlinecourseserver.onrender.com/api/v1",
 ];
 
 const pingUrls = (urls) => {
   urls.forEach((url) =>
-    axios.get(url).catch((e) => LogModel.saveExceptionLog(e.message))
+    axios
+      .get(url)
+      .catch((e) => LogModel.saveExceptionLog(`${url} | ${e.message}`))
   );
 };
 
