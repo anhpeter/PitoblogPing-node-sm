@@ -3,16 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
 
-const startDate = new Date();
 const app = express();
 app.use(express.json({ extended: false }));
-
-// CONNECT DATABASE
-mongoose
-  .connect(
-    "mongodb+srv://admin:VhN1XrRdTvwG1TJX@hobbies.ba9s98h.mongodb.net/kaffeine?retryWrites=true&w=majority"
-  )
-  .catch((e) => console.error(e));
 
 const logSchema = new mongoose.Schema({
   type: String,
@@ -39,7 +31,31 @@ const LogModel = {
       timestamp: new Date().toISOString(),
     }).save();
   },
+  saveEventLog: (message, eventType) => {
+    return new Log({
+      type: `${eventType}-event`,
+      message,
+      timestamp: new Date().toISOString(),
+    }).save();
+  },
 };
+
+// CONNECT DATABASE
+mongoose
+  .connect(
+    "mongodb+srv://admin:VhN1XrRdTvwG1TJX@hobbies.ba9s98h.mongodb.net/kaffeine?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    console.info("DB connected");
+    if (process.env.NODE_ENV === "production") {
+      LogModel.saveEventLog(new Date().toISOString(), "server-start").then(
+        () => {
+          console.info("Saved server start event!");
+        }
+      );
+    }
+  })
+  .catch((e) => console.error(e));
 
 const Helper = {
   toReadableTime: (timestamp) => {
@@ -100,13 +116,23 @@ app.get("/", async (req, res) => {
     .sort({ timestamp: -1 })
     .limit(10)
     .catch((e) => LogModel.saveExceptionLog(e.message));
+  //
+  const serverStarts = await Log.find({ type: "server-start-event" })
+    .sort({ timestamp: -1 })
+    .limit(10)
+    .catch((e) => LogModel.saveExceptionLog(e.message));
+  const severStartMessages = serverStarts.map(
+    (item) =>
+      moment(new Date(item.message))
+        .utcOffset(7)
+        .format("YYYY/MM/DD HH:mm:ss") + " GMT+7"
+  );
 
   //
   const exceptions = await Log.find({ type: "exception" })
     .sort({ timestamp: -1 })
-    .limit(50)
+    .limit(10)
     .catch((e) => LogModel.saveExceptionLog(e.message));
-
   const exceptionMessages = exceptions.map((ex) => ({
     message: ex.message,
     timestamp: ex.timestamp,
@@ -115,18 +141,18 @@ app.get("/", async (req, res) => {
   res.end(
     JSON.stringify(
       {
-        message: "kaffeine works",
-        severStartAt:
-          moment(startDate).utcOffset(7).format("YYYY/MM/DD HH:mm:ss") +
-          " GMT+7",
-        pingUrls,
-        pingUrlTimestamps: pings.map((item) =>
+        status: "peter-kaffeine working",
+        ping: {
+          urls: pingUrls,
+          timestamps: pings.map((item) =>
+            Helper.toReadableTime(item.timestamp)
+          ),
+        },
+        ping_me_timestamps: pingMes.map((item) =>
           Helper.toReadableTime(item.timestamp)
         ),
-        pingMeTimestamps: pingMes.map((item) =>
-          Helper.toReadableTime(item.timestamp)
-        ),
-        exceptions: exceptionMessages,
+        server_start_timestamps: severStartMessages,
+        last_10_exceptions: exceptionMessages,
       },
       null,
       4
